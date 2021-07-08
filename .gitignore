@@ -1,3 +1,10 @@
+# Generated files
+bin/
+cmake-build-debug/
+
+# CLion
+.idea/
+
 # Prerequisites
 *.d
 
