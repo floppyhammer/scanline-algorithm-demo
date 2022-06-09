@@ -1,3 +1,3 @@
 Scanline VG Renderer
 =========
-A simple SVG renderer based on the scanline algorithm.
+A vector renderer demo using the scanline algorithm. This is only for tutorial purposes.

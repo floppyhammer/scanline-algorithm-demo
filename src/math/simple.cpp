@@ -2,22 +2,22 @@
 
 #include <cmath>
 
-FP_TYPE my_round(FP_TYPE var, int decimal) {
+float my_round(float var, int decimal) {
     // 37.66666 * 100 =3766.66
     // 3766.66 + .5 =3767.16    for rounding off value
     // then type cast to int so value is 3767
     // then divided by 100 so the value converted into 37.67
-    FP_TYPE factor = pow(10.0, decimal);
-    FP_TYPE value = (int)(var * factor + 0.5);
-    return (FP_TYPE)value / factor;
+    float factor = pow(10.0, decimal);
+    float value = (int)(var * factor + 0.5);
+    return (float)value / factor;
 }
 
-void cubic_roots(const FP_TYPE* polynomial, FP_TYPE* root) {
+void cubic_roots(const float* polynomial, float* root) {
     // cubic function: f(x)=ax^3+bx^2+cx+d (a ≠ 0)
-    FP_TYPE a = polynomial[0];
-    FP_TYPE b = polynomial[1];
-    FP_TYPE c = polynomial[2];
-    FP_TYPE d = polynomial[3];
+    float a = polynomial[0];
+    float b = polynomial[1];
+    float c = polynomial[2];
+    float d = polynomial[3];
 
     //printf("\nPolynomial %f %f %f %f", a, b, c, d);
 
@@ -43,7 +43,7 @@ void cubic_roots(const FP_TYPE* polynomial, FP_TYPE* root) {
         }
 
         // quadratic discriminant
-        FP_TYPE DQ = pow(c, 2.0) - 4.0 * b * d;
+        float DQ = pow(c, 2.0) - 4.0 * b * d;
         if (DQ >= 0) {
             DQ = sqrt(DQ);
 
@@ -64,26 +64,26 @@ void cubic_roots(const FP_TYPE* polynomial, FP_TYPE* root) {
         return;
     }
 
-    FP_TYPE A = b / a;
-    FP_TYPE B = c / a;
-    FP_TYPE C = d / a;
+    float A = b / a;
+    float B = c / a;
+    float C = d / a;
 
-    FP_TYPE Q = (3.0f * B - pow(A, 2.0f)) / 9.0f;
-    FP_TYPE R = (9.0f * A * B - 27.0f * C - 2.0f * pow(A, 3.0f)) / 54.0f;
+    float Q = (3.0f * B - pow(A, 2.0f)) / 9.0f;
+    float R = (9.0f * A * B - 27.0f * C - 2.0f * pow(A, 3.0f)) / 54.0f;
 
     // polynomial discriminant
-    FP_TYPE D = pow(Q, 3.0f) + pow(R, 2.0f);
+    float D = pow(Q, 3.0f) + pow(R, 2.0f);
     //printf("\nD %f", D);
     // complex or duplicate roots
     if (D >= 0.0f) {
-        FP_TYPE S = sign(R + sqrt(D)) * pow(abs(R + sqrt(D)), (1.0f / 3.0f));
-        FP_TYPE T = sign(R - sqrt(D)) * pow(abs(R - sqrt(D)), (1.0f / 3.0f));
+        float S = sign(R + sqrt(D)) * pow(abs(R + sqrt(D)), (1.0f / 3.0f));
+        float T = sign(R - sqrt(D)) * pow(abs(R - sqrt(D)), (1.0f / 3.0f));
 
         root[0] = -A / 3.0f + (S + T); // real root
         root[1] = -A / 3.0f - (S + T) / 2.0f; // real part of complex root
         root[2] = -A / 3.0f - (S + T) / 2.0f; // real part of complex root
 
-        FP_TYPE imaginary = abs(sqrt(3.0f) * (S - T) / 2.0f); // complex part of root pair
+        float imaginary = abs(sqrt(3.0f) * (S - T) / 2.0f); // complex part of root pair
 
         // discard complex roots
         if (imaginary != 0.0f) {
@@ -93,7 +93,7 @@ void cubic_roots(const FP_TYPE* polynomial, FP_TYPE* root) {
     }
     // distinct real roots
     else {
-        FP_TYPE th = acos(R / sqrt(-pow(Q, 3.0f)));
+        float th = acos(R / sqrt(-pow(Q, 3.0f)));
 
         root[0] = 2.0f * sqrt(-Q) * cos(th / 3.0f) - A / 3.0f;
         root[1] = 2.0f * sqrt(-Q) * cos((th + 2.0f * PI) / 3.0f) - A / 3.0f;
@@ -109,7 +109,7 @@ void cubic_roots(const FP_TYPE* polynomial, FP_TYPE* root) {
     sort(root, 3);
 }
 
-void bezier_coeffs(FP_TYPE P0, FP_TYPE P1, FP_TYPE P2, FP_TYPE P3, FP_TYPE* Z) {
+void bezier_coeffs(float P0, float P1, float P2, float P3, float* Z) {
     Z[0] = -P0 + 3.0f * P1 - 3.0f * P2 + P3;
     Z[1] = 3.0f * P0 - 6.0f * P1 + 3.0f * P2;
     Z[2] = -3.0f * P0 + 3.0f * P1;
@@ -127,16 +127,16 @@ void bezier_coeffs(FP_TYPE P0, FP_TYPE P1, FP_TYPE P2, FP_TYPE P3, FP_TYPE* Z) {
  */
 void compute_intersections(const float* p, const float* lx, const float* ly, float* I) {
     // A=y2-y1
-    FP_TYPE A = ly[1] - ly[0];
+    float A = ly[1] - ly[0];
     // B=x1-x2
-    FP_TYPE B = lx[0] - lx[1];
+    float B = lx[0] - lx[1];
     // C=x1*(y1-y2)+y1*(x2-x1)
-    FP_TYPE C = lx[0] * (ly[0] - ly[1]) + ly[0] * (lx[1] - lx[0]);
+    float C = lx[0] * (ly[0] - ly[1]) + ly[0] * (lx[1] - lx[0]);
 
     //printf("ABC %f %f %f", A, B, C);
 
-    FP_TYPE bx[] = {0.0, 0.0, 0.0, 0.0};
-    FP_TYPE by[] = {0.0, 0.0, 0.0, 0.0};
+    float bx[] = {0.0, 0.0, 0.0, 0.0};
+    float by[] = {0.0, 0.0, 0.0, 0.0};
 
 //    printf("\nP");
 //    for (int i = 0; i < 8; i++) {
@@ -164,13 +164,13 @@ void compute_intersections(const float* p, const float* lx, const float* ly, flo
 //        printf(" %f", i);
 //    }
 
-    FP_TYPE P[] = {0.0, 0.0, 0.0, 0.0};
+    float P[] = {0.0, 0.0, 0.0, 0.0};
     P[0] = A * bx[0] + B * by[0]; // t^3
     P[1] = A * bx[1] + B * by[1]; // t^2
     P[2] = A * bx[2] + B * by[2]; // t
     P[3] = A * bx[3] + B * by[3] + C; // 1
 
-    FP_TYPE r[] = {-1.0, -1.0, -1.0};
+    float r[] = {-1.0, -1.0, -1.0};
     cubic_roots(P, r);
 
 //    for (int i = 0; i < 3; i++) {
@@ -182,15 +182,15 @@ void compute_intersections(const float* p, const float* lx, const float* ly, flo
     // Verify the roots are in bounds of the linear segment.
     for (int i = 0; i < 3; i++) {
         // Linear coordinate
-        FP_TYPE t = r[i];
+        float t = r[i];
 
-        FP_TYPE X[2];
+        float X[2];
         X[0] = bx[0] * pow(t, 3.0f) + bx[1] * pow(t, 2.0f) + bx[2] * t + bx[3];
         X[1] = by[0] * pow(t, 3.0f) + by[1] * pow(t, 2.0f) + by[2] * t + by[3];
 
         // above is intersection point assuming infinitely long line segment,
         // make sure we are also in bounds of the line
-        FP_TYPE s;
+        float s;
 
         // if not vertical line
         if ((lx[1]-lx[0]) != 0) {

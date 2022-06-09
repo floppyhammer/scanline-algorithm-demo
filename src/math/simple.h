@@ -3,9 +3,6 @@
 
 # define PI 3.14159265358979323846
 
-// Using float may cause incorrect intersection calculation.
-# define FP_TYPE double
-
 template <typename T>
 inline T sign(T val) {
     return (T(0) < val) - (val < T(0));
