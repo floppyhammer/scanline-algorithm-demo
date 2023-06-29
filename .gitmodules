@@ -1,4 +1,3 @@
-[submodule "libglfw"]
+[submodule "external/glfw"]
 	path = external/glfw
 	url = https://github.com/glfw/glfw.git
-	branch = "3.3-stable"

@@ -1,16 +1,6 @@
-#include "simple.h"
+#include "simple_math.h"
 
 #include <cmath>
-
-float my_round(float var, int decimal) {
-    // 37.66666 * 100 =3766.66
-    // 3766.66 + .5 =3767.16    for rounding off value
-    // then type cast to int so value is 3767
-    // then divided by 100 so the value converted into 37.67
-    float factor = pow(10.0, decimal);
-    float value = (int)(var * factor + 0.5);
-    return (float)value / factor;
-}
 
 void cubic_roots(const float* polynomial, float* root) {
     // cubic function: f(x)=ax^3+bx^2+cx+d (a ≠ 0)
@@ -19,7 +9,7 @@ void cubic_roots(const float* polynomial, float* root) {
     float c = polynomial[2];
     float d = polynomial[3];
 
-    //printf("\nPolynomial %f %f %f %f", a, b, c, d);
+    // printf("\nPolynomial %f %f %f %f", a, b, c, d);
 
     if (a == 0) {
         if (b == 0) {
@@ -34,8 +24,7 @@ void cubic_roots(const float* polynomial, float* root) {
             root[2] = -1.0f;
 
             // discard out of spec roots
-            if (root[0] == 1.0f)
-                root[0] = -1.0f;
+            if (root[0] == 1.0f) root[0] = -1.0f;
 
             // sort but place -1 at the end
             sort(root, 3);
@@ -53,8 +42,7 @@ void cubic_roots(const float* polynomial, float* root) {
 
             // discard out of spec roots
             for (int i = 0; i < 2; i++) {
-                if (root[i] == 1.0)
-                    root[i] = -1.0;
+                if (root[i] == 1.0) root[i] = -1.0;
             }
         }
 
@@ -73,15 +61,15 @@ void cubic_roots(const float* polynomial, float* root) {
 
     // polynomial discriminant
     float D = pow(Q, 3.0f) + pow(R, 2.0f);
-    //printf("\nD %f", D);
-    // complex or duplicate roots
+    // printf("\nD %f", D);
+    //  complex or duplicate roots
     if (D >= 0.0f) {
         float S = sign(R + sqrt(D)) * pow(abs(R + sqrt(D)), (1.0f / 3.0f));
         float T = sign(R - sqrt(D)) * pow(abs(R - sqrt(D)), (1.0f / 3.0f));
 
-        root[0] = -A / 3.0f + (S + T); // real root
-        root[1] = -A / 3.0f - (S + T) / 2.0f; // real part of complex root
-        root[2] = -A / 3.0f - (S + T) / 2.0f; // real part of complex root
+        root[0] = -A / 3.0f + (S + T);                      // real root
+        root[1] = -A / 3.0f - (S + T) / 2.0f;               // real part of complex root
+        root[2] = -A / 3.0f - (S + T) / 2.0f;               // real part of complex root
 
         float imaginary = abs(sqrt(3.0f) * (S - T) / 2.0f); // complex part of root pair
 
@@ -133,51 +121,51 @@ void compute_intersections(const float* p, const float* lx, const float* ly, flo
     // C=x1*(y1-y2)+y1*(x2-x1)
     float C = lx[0] * (ly[0] - ly[1]) + ly[0] * (lx[1] - lx[0]);
 
-    //printf("ABC %f %f %f", A, B, C);
+    // printf("ABC %f %f %f", A, B, C);
 
     float bx[] = {0.0, 0.0, 0.0, 0.0};
     float by[] = {0.0, 0.0, 0.0, 0.0};
 
-//    printf("\nP");
-//    for (int i = 0; i < 8; i++) {
-//        printf(" %f", p[i]);
-//    }
+    //    printf("\nP");
+    //    for (int i = 0; i < 8; i++) {
+    //        printf(" %f", p[i]);
+    //    }
 
     bezier_coeffs(p[0], p[2], p[4], p[6], bx);
     bezier_coeffs(p[1], p[3], p[5], p[7], by);
 
-//    printf("\nbx");
-//    for (int i = 0; i < 4; i++) {
-//        printf(" %f", bx[i]);
-//    }
-//    printf("\nby");
-//    for (int i = 0; i < 4; i++) {
-//        printf(" %f", by[i]);
-//    }
-//
-//    printf("\nZ1");
-//    for (float i : bx) {
-//        printf(" %f", i);
-//    }
-//    printf("\nZ2");
-//    for (float i : by) {
-//        printf(" %f", i);
-//    }
+    //    printf("\nbx");
+    //    for (int i = 0; i < 4; i++) {
+    //        printf(" %f", bx[i]);
+    //    }
+    //    printf("\nby");
+    //    for (int i = 0; i < 4; i++) {
+    //        printf(" %f", by[i]);
+    //    }
+    //
+    //    printf("\nZ1");
+    //    for (float i : bx) {
+    //        printf(" %f", i);
+    //    }
+    //    printf("\nZ2");
+    //    for (float i : by) {
+    //        printf(" %f", i);
+    //    }
 
     float P[] = {0.0, 0.0, 0.0, 0.0};
-    P[0] = A * bx[0] + B * by[0]; // t^3
-    P[1] = A * bx[1] + B * by[1]; // t^2
-    P[2] = A * bx[2] + B * by[2]; // t
+    P[0] = A * bx[0] + B * by[0];     // t^3
+    P[1] = A * bx[1] + B * by[1];     // t^2
+    P[2] = A * bx[2] + B * by[2];     // t
     P[3] = A * bx[3] + B * by[3] + C; // 1
 
     float r[] = {-1.0, -1.0, -1.0};
     cubic_roots(P, r);
 
-//    for (int i = 0; i < 3; i++) {
-//        //if (r[i] > -1) {
-//            printf("\nroot %d %f", i, r[i]);
-//        //}
-//    }
+    //    for (int i = 0; i < 3; i++) {
+    //        //if (r[i] > -1) {
+    //            printf("\nroot %d %f", i, r[i]);
+    //        //}
+    //    }
 
     // Verify the roots are in bounds of the linear segment.
     for (int i = 0; i < 3; i++) {
@@ -193,10 +181,10 @@ void compute_intersections(const float* p, const float* lx, const float* ly, flo
         float s;
 
         // if not vertical line
-        if ((lx[1]-lx[0]) != 0) {
-            s = (X[0]-lx[0])/(lx[1]-lx[0]);
+        if ((lx[1] - lx[0]) != 0) {
+            s = (X[0] - lx[0]) / (lx[1] - lx[0]);
         } else {
-            s = (X[1]-ly[0])/(ly[1]-ly[0]);
+            s = (X[1] - ly[0]) / (ly[1] - ly[0]);
         }
 
         // in bounds?

@@ -1,19 +1,20 @@
-#include "math/simple.h"
-
+#include <algorithm>
+#include <chrono>
 #include <cstdio>
 #include <iostream>
-#include <chrono>
 #include <vector>
-#include <algorithm>
 
 #define NANOSVG_IMPLEMENTATION
 
-#include <nanosvg.h>
-
-#include <glad/glad.h>
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include <nanosvg.h>
+#define GLAD_GL_IMPLEMENTATION
+#include <glad/gl.h>
 
-//#define DEBUG
+#include "simple_math.h"
+
+#define SCANLINE_DEBUG
 
 NSVGimage *vgImage = nullptr;
 
@@ -35,8 +36,7 @@ static float distPtSeg(float x, float y, float px, float py, float qx, float qy)
     d = pqx * pqx + pqy * pqy;
     t = pqx * dx + pqy * dy;
 
-    if (d > 0)
-        t /= d;
+    if (d > 0) t /= d;
 
     if (t < 0)
         t = 0;
@@ -49,9 +49,8 @@ static float distPtSeg(float x, float y, float px, float py, float qx, float qy)
     return dx * dx + dy * dy;
 }
 
-static void cubicBez(float x1, float y1, float x2, float y2,
-                     float x3, float y3, float x4, float y4,
-                     float tol, int level) {
+static void cubicBez(
+    float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, float tol, int level) {
     float x12, y12, x23, y23, x34, y34, x123, y123, x234, y234, x1234, y1234;
     float d;
 
@@ -176,14 +175,14 @@ void drawFrame(GLFWwindow *window, double delta) {
     float hh = vgImage->height * 0.5f;
 
     float view[4], aspect;
-    if ((float) width / hw < (float) height / hh) {
-        aspect = (float) height / (float) width;
+    if ((float)width / hw < (float)height / hh) {
+        aspect = (float)height / (float)width;
         view[0] = cx - hw * 1.2f;
         view[2] = cx + hw * 1.2f;
         view[1] = cy - hw * 1.2f * aspect;
         view[3] = cy + hw * 1.2f * aspect;
     } else {
-        aspect = (float) width / (float) height;
+        aspect = (float)width / (float)height;
         view[0] = cx - hh * 1.2f * aspect;
         view[2] = cx + hh * 1.2f * aspect;
         view[1] = cy - hh * 1.2f;
@@ -213,12 +212,12 @@ void drawFrame(GLFWwindow *window, double delta) {
     glEnd();
 
     // Traverse the scanlines.
-    for (int scanline_y = 0; scanline_y < (int) vgImage->height; scanline_y++) {
+    for (int scanline_y = 0; scanline_y < (int)vgImage->height; scanline_y++) {
         // Scanline formula.
         float lx[] = {0.0f, vgImage->width};
-        float ly[] = {(float) scanline_y, (float) scanline_y};
+        float ly[] = {(float)scanline_y, (float)scanline_y};
 
-#ifdef DEBUG
+#ifdef SCANLINE_DEBUG
         // Draw scanline
         glColor4ub(220, 220, 220, 50);
         glLineWidth(1);
@@ -254,7 +253,7 @@ void drawFrame(GLFWwindow *window, double delta) {
                     for (int i = 0; i < 3; i++) {
                         // Store valid intersection points and discard invalid ones.
                         if (abs(I[i * 2]) < 10000.0f && abs(I[i * 2 + 1]) < 10000.0f) {
-                            //std::cout << i << " - " << I[i * 2] << "," << I[i * 2 + 1] << std::endl;
+                            // std::cout << i << " - " << I[i * 2] << "," << I[i * 2 + 1] << std::endl;
                             std::vector<float> ip{I[i * 2], I[i * 2 + 1]};
                             intersection_points.push_back(ip);
                         }
@@ -263,10 +262,9 @@ void drawFrame(GLFWwindow *window, double delta) {
             }
 
             // Sort intersection points by X
-            sort(intersection_points.begin(), intersection_points.end(),
-                 [](const std::vector<float> &a, const std::vector<float> &b) {
-                     return a[0] < b[0];
-                 });
+            sort(intersection_points.begin(),
+                 intersection_points.end(),
+                 [](const std::vector<float> &a, const std::vector<float> &b) { return a[0] < b[0]; });
 
             // Draw image line by line
             bool to_fill = false;
@@ -286,13 +284,13 @@ void drawFrame(GLFWwindow *window, double delta) {
                 to_fill = !to_fill;
             }
 
-#ifdef DEBUG
-            // Draw intersection points
-            for (auto &point: intersection_points) {
+#ifdef SCANLINE_DEBUG
+            // Draw intersection points.
+            for (auto &point : intersection_points) {
                 glColor4ub(255, 0, 0, 255);
                 glBegin(GL_POINTS);
                 glVertex2f(point[0], point[1]);
-                //printf(" (%.1f, %.1f)", intersection_points[i][0], intersection_points[i][1]);
+                // printf(" (%.1f, %.1f)", intersection_points[i][0], intersection_points[i][1]);
                 glEnd();
             }
 #endif
@@ -312,15 +310,16 @@ void resize_cb(GLFWwindow *window, int width, int height) {
 }
 
 int main() {
-    if (!glfwInit())
+    if (!glfwInit()) {
         return -1;
+    }
 
     const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
     int screenWidth = mode->width;
     int screenHeight = mode->height;
 
-    GLFWwindow *window = glfwCreateWindow(screenWidth - 800, screenHeight - 400,
-                                          "Scanline VG Renderer", nullptr, nullptr);
+    GLFWwindow *window =
+        glfwCreateWindow(screenWidth - 800, screenHeight - 400, "Scanline VG Renderer", nullptr, nullptr);
     if (!window) {
         printf("Could not create window!\n");
         glfwTerminate();
@@ -329,16 +328,14 @@ int main() {
 
     glfwSetFramebufferSizeCallback(window, resize_cb);
     glfwMakeContextCurrent(window);
-    //glEnable(GL_POINT_SMOOTH);
-    //glEnable(GL_LINE_SMOOTH);
 
     // GLAD: load all OpenGL function pointers.
-    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+    if (!gladLoadGL(glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
 
-    vgImage = nsvgParseFromFile("../res/features.svg", "px", 96.0f);
+    vgImage = nsvgParseFromFile("../assets/features.svg", "px", 96.0f);
     if (vgImage == nullptr) {
         printf("Could not open the SVG file!\n");
         glfwTerminate();

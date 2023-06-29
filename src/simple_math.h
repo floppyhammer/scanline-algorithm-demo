@@ -1,7 +1,7 @@
 #ifndef MATH_SIMPLE_CPP
 #define MATH_SIMPLE_CPP
 
-# define PI 3.14159265358979323846
+const float PI = 3.14159265358979323846;
 
 template <typename T>
 inline T sign(T val) {
@@ -23,8 +23,7 @@ inline void sort(T arr[], int n) {
         // Find the minimum element in unsorted array.
         int min_idx = i;
         for (int j = i + 1; j < n; j++) {
-            if (arr[j] < arr[min_idx])
-                min_idx = j;
+            if (arr[j] < arr[min_idx]) min_idx = j;
         }
 
         // Swap the found minimum element with the first element.
@@ -39,4 +38,4 @@ void bezier_coeffs(float P0, float P1, float P2, float P3, float* Z);
 /// Computes intersection between a cubic spline and a line segment.
 void compute_intersections(const float* p, const float* lx, const float* ly, float* I);
 
-#endif //MATH_SIMPLE_CPP
+#endif // MATH_SIMPLE_CPP

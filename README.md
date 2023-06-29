@@ -1,3 +1,3 @@
-Scanline VG Renderer
-=========
-A vector renderer demo using the scanline algorithm. This is only for tutorial purposes.
+# Scanline Algorithm Demo
+
+This is a primitive demo explaining the scanline algorithm for vector graphics rendering.

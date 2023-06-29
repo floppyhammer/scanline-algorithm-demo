@@ -1,6 +1,7 @@
 # Generated files
 bin/
 cmake-build-debug/
+cmake-build-release/
 
 # CLion
 .idea/
